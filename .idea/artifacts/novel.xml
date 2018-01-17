@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="novel">
+    <output-path>$PROJECT_DIR$/out/artifacts/novel</output-path>
+    <root id="archive" name="novel.jar">
+      <element id="module-output" name="WebPageCrawling" />
+      <element id="library" level="project" name="jsoup-1.10.3" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>
