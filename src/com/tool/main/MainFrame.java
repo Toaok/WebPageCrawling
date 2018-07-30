@@ -1,8 +1,7 @@
 package com.tool.main;
 
 import com.tool.crawl.CrawlNovelFromHtml;
-import com.tool.crawl.biquge.impl.CrawlBiQuGeImpl;
-import com.tool.crawl.dingdian.impl.CrawlDingDianImpl;
+import com.tool.crawl.CrawlNovelFromHtmlImp;
 import com.tool.vo.Site;
 
 import javax.swing.*;
@@ -45,8 +44,9 @@ public class MainFrame extends JFrame {
 
         //实例化控件
         mSite = new JComboBox();
-        mSite.addItem(Site.DINGDIAN_SITE);
         mSite.addItem(Site.BIQUGE_SITE);
+        mSite.addItem(Site.DINGDIAN_SITE);
+
 
         mUrl = new JTextField();
 
@@ -59,6 +59,7 @@ public class MainFrame extends JFrame {
         this.add(mDownloadButton, BorderLayout.EAST);
         this.add(new Panel(), BorderLayout.SOUTH);
 
+
         mDownloadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,11 +69,16 @@ public class MainFrame extends JFrame {
                     String selectSite = mSite.getSelectedItem().toString();
                     switch (selectSite) {
                         case Site.DINGDIAN_SITE:
-                            crawlNovelFromHtml = new CrawlDingDianImpl(url);
+                            crawlNovelFromHtml =new CrawlNovelFromHtmlImp.Builder()
+                                    .url(url)
+                                    .additionalChapter(8)
+                                    .builder();
                             crawlNovelFromHtml.download("F:" + File.separator + "Downloads" + File.separator + "小说");
                             break;
                         case Site.BIQUGE_SITE:
-                            crawlNovelFromHtml = new CrawlBiQuGeImpl(url);
+                            crawlNovelFromHtml =new CrawlNovelFromHtmlImp.Builder()
+                                    .url(url)
+                                    .builder();
                             crawlNovelFromHtml.download("F:" + File.separator + "Downloads" + File.separator + "小说");
                             break;
                     }

@@ -12,7 +12,7 @@ public class NovelDownload {
     public static void main(String[] args) {
 
 
-//        CrawlNovelFromHtmlLBase crawlContentFromHTML = new CrawlDingDianImpl("http://www.booktxt.net/2_2219/");
+//        CrawlNovelFromHtmlImp crawlContentFromHTML = new CrawlDingDianImpl("http://www.booktxt.net/2_2219/");
 //        crawlContentFromHTML.download("F:" + File.separator + "Downloads" + File.separator + "小说");
 
 
