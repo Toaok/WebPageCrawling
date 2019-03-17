@@ -12,6 +12,7 @@ public interface CrawlNovelFromHtml {
      * @param filePath
      */
     String download(String filePath);
+    String download();
 
     /**
      * 获取小说名

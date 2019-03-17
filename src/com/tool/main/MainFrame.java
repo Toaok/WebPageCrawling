@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 
 /**
  * @author TOAOK
@@ -73,13 +72,13 @@ public class MainFrame extends JFrame {
                                     .url(url)
                                     .additionalChapter(8)
                                     .builder();
-                            crawlNovelFromHtml.download("F:" + File.separator + "Downloads" + File.separator + "小说");
+                            crawlNovelFromHtml.download();
                             break;
                         case Site.BIQUGE_SITE:
                             crawlNovelFromHtml =new CrawlNovelFromHtmlImp.Builder()
                                     .url(url)
                                     .builder();
-                            crawlNovelFromHtml.download("F:" + File.separator + "Downloads" + File.separator + "小说");
+                            crawlNovelFromHtml.download();
                             break;
                     }
                 } else {

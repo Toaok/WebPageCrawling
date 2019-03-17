@@ -1,5 +1,6 @@
 package com.tool.crawl;
 
+import com.tool.main.NovelDownload;
 import com.tool.utils.CrawlUtils;
 import com.tool.utils.GeneratingTXTDocuments;
 import com.tool.utils.ThreadPoolManager;
@@ -39,15 +40,14 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
     private String url;//访问小说主页面的url
 
     private Lock mLock;
-    private List<Chapter> mChapters;//每章内容
+    private List<Chapter> mChapters;//章节信息对象数组
     private List<Condition> mConditions;//线程锁
     private int mCountChapter;//总章节数
-    private int additionalChapter;//额外章节
+    private int additionalChapter;//无效章节
     private Map<String, String> cookies;//请求cookie
 
     private GeneratingTXTDocuments mDocuments;//生成txt文件
 
-//    private String rootUrl = "";
 
     CrawlNovelFromHtmlImp(Builder builder) {
 
@@ -101,29 +101,33 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         Elements catalog = main.select("div#wrapper>div.box_con>div#list>dl");
         Elements chapters = catalog.select("a");
 
-        mCountChapter = chapters.size() - additionalChapter;//实际章节数
+        //实际章节数
+        mCountChapter = chapters.size() - additionalChapter;
 
         for (int i = 0; i < mCountChapter; ++i) {
             Element e = chapters.get(i + additionalChapter);
             String chapterNmae = e.text();
 
-            Condition condition = mLock.newCondition();//为每个章节创建一个锁
+            //为每个章节创建一个锁
+            Condition condition = mLock.newCondition();
             mConditions.add(condition);
-            Chapter chapter = new Chapter();//创建一个章节对象
+            //创建一个章节对象
+            Chapter chapter = new Chapter();
             //章节名
             chapter.setChapterName(chapterNmae);
             //获取章节的url
             String chapterUrl = e.attr("href");
             chapter.setUrl(getChapterUrl(chapterUrl));
+            //加入到章节信息列表
             mChapters.add(chapter);
-            //请求
+            //获取章节类容
             ThreadPoolManager.getInstance().execute(new Task(i));
         }
 
     }
 
     /**
-     * 根据章节内容数组，重定向到每章获取每章内容
+     * 根据章节信息数组，重定向到每章获取每章内容
      *
      * @param number
      * @throws IOException
@@ -133,8 +137,9 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         StringBuffer chapterBuffer = new StringBuffer();
         //添加章节名
         chapterBuffer.append(mChapters.get(number).getChapterName());
-        //换行
         chapterBuffer.append(System.getProperty("line.separator"));
+
+        //爬取章节信息
         Document chapterDoc = Jsoup.connect(mChapters.get(number).getUrl())
                 .method(Connection.Method.GET)
                 .headers(CrawlUtils.getHeader())
@@ -146,9 +151,12 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         //获取章节正文，并格式化。
         String chapterContent = CrawlUtils.contentFormat(e.text());
         chapterBuffer.append(chapterContent);
-
         chapterBuffer.append(System.getProperty("line.separator"));
-        mChapters.get(number).setContent(chapterBuffer.toString());
+
+        //获取章节信息对象
+        Chapter chapter = mChapters.get(number);
+        //将章节正文添加到章节信对象中
+        chapter.setContent(chapterBuffer.toString());
     }
 
     @Override
@@ -159,6 +167,12 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
 
     @Override
     public String download(String filePath) {
+        if (filePath == null || filePath.equals("")) {
+            filePath = CrawlUtils.getDefaultPath();
+        }
+
+        System.out.println("文件路径："+filePath);
+
         String result = "";
         try {
             mDocuments = new GeneratingTXTDocuments(filePath, getNovelName() + ".txt");
@@ -169,12 +183,22 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         return result;
     }
 
+    @Override
+    public String download() {
+        return download(CrawlUtils.getDefaultPath());
+    }
 
     private String getChapterUrl(String chapterUrl) {
         return (chapterUrl.startsWith("http") || chapterUrl.startsWith("https")) ? chapterUrl : (getRootUrl(url) + (chapterUrl.contains(getPath(url)) ? chapterUrl : getPath(url) + chapterUrl));
     }
 
 
+    /**
+     * 在该线程中执行的任务是：
+     * ->首先通过重定向获取章节内容（这里要进行网络请求，比较耗时）
+     * ->然后判断该章节的上一章是否已存储 [是]->开始存储本章节 [否]->等待上一章存储完成
+     * 这里好像没什么用
+     */
     private class Task implements Runnable {
 
         private int number;
@@ -186,12 +210,13 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         @Override
         public void run() {
             try {
-                //重定向到章节内容
+                //重定向到章节内容，获取章节正文
                 dispatcher(number);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
+            //获取到内容后进行存储
             Chapter chapter = mChapters.get(number);
 
             mLock.lock();
@@ -203,7 +228,7 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
                     chapter.setSaved(true);
                     if (number < mConditions.size() - 1)
                         mConditions.get(number + 1).signal();
-                } else {
+                } else {//number==0,存储第一章不需要等待
                     mDocuments.writeDate(chapter.getContent());
                     chapter.setSaved(true);
                     if (number < mConditions.size() - 1)
@@ -220,7 +245,7 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
             float progress = chapterTaskCount / (float) (mCountChapter) * 100;
             if (progress < 100) {
                 System.out.printf("已下载: %5.2f%%\r", progress);
-            }else if(progress==100){
+            } else if (progress == 100) {
                 System.out.printf("已下载: %5.2f%%\n", progress);
             }
 
