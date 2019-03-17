@@ -13,73 +13,6 @@ import java.util.Map;
  */
 public class CrawlUtils {
     public static final int TIME_OUT = 1000 * 5;
-    public static final String METHOD_GET = "GET";
-    public static final String METHOD_POST = "POST";
-
-    public static String HttpGet(String path) {
-        try {
-            return HttpGet(new URL(path));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
-    public static String HttpGet(URL url) {
-
-        HttpURLConnection connection = null;
-        String response = "";
-        try {
-            CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
-            connection = (HttpURLConnection) url.openConnection();
-
-            //设置连接参数
-            connection.setReadTimeout(TIME_OUT);
-            connection.setConnectTimeout(TIME_OUT);
-            connection.setDoInput(true);
-            connection.setRequestMethod(METHOD_GET);
-            //设置请求消息头
-            connection.setRequestProperty("accept", "*/*");
-            connection.setRequestProperty("connection", "Keep-ALive");
-            connection.setRequestProperty("charset", "utf-8");
-            connection.connect();
-
-            switch (connection.getResponseCode()) {
-
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    Thread.sleep(TIME_OUT);
-                    break;
-                case HttpURLConnection.HTTP_OK:
-                    InputStream inputStream = null;
-                    BufferedReader reader = null;
-                    try {
-                        inputStream = connection.getInputStream();
-
-                        StringBuffer buffer = new StringBuffer();
-
-                        reader = new BufferedReader(new InputStreamReader(inputStream));
-                        String readLine = null;
-
-                        while ((readLine = reader.readLine()) != null) {
-                            buffer.append(readLine);
-                        }
-                        response = buffer.toString();
-                    } finally {
-                        if (reader != null) ;
-                        {
-                            reader.close();
-                        }
-                        connection.disconnect();
-                    }
-                    break;
-                case HttpURLConnection.HTTP_MOVED_TEMP:
-                    break;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
 
     public static Map<String, String> getCookies(String path) throws IOException {
         Map<String, String> cookies = new HashMap<>();
@@ -98,6 +31,49 @@ public class CrawlUtils {
         return cookies;
     }
 
+
+    public static String getRootUrl(String site){
+        StringBuffer buffer=new StringBuffer();
+        if(!"".equals(site)){
+            try {
+                URL url=new URL(site);
+                buffer.append(url.getProtocol());
+                buffer.append("://");
+                buffer.append(url.getHost());
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+        return buffer.toString();
+    }
+
+    public static String getPath(String site){
+        String path="";
+        if(!"".equals(site)){
+            try {
+                URL url=new URL(site);
+                path=url.getPath();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        }
+        return path;
+    }
+
+    public static Map getHeader() {
+        Map<String,String> map=new HashMap();
+        map.put("Accept","text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+        map.put("Accept-Encoding"," gzip, deflate");
+        map.put("Accept-Language", "zh,zh-CN;q=0.9,en;q=0.8");
+        map.put("Cache-Control","max-age=0");
+        map.put("Connection","keep-alive");
+        map.put("Cookie","Hm_lvt_913379d9cb2e5d673397376689e75b12=1523805110; width=85%25; Hm_lpvt_913379d9cb2e5d673397376689e75b12=1523805588");
+        map.put("Host","www.b5200.net");
+        map.put("Upgrade-Insecure-Requests","1");
+        map.put("User-Agent","Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36");
+
+        return map;
+    }
 
     /**
      * 格式化章节内容

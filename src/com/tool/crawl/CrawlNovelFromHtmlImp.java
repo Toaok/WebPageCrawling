@@ -51,8 +51,8 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
 
     CrawlNovelFromHtmlImp(Builder builder) {
 
-        this.url=builder.url;
-        this.additionalChapter=builder.additionalChapter;
+        this.url = builder.url;
+        this.additionalChapter = builder.additionalChapter;
 
         try {
             cookies = CrawlUtils.getCookies(url);
@@ -73,19 +73,19 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         int additionalChapter;
 
         public Builder url(String url) {
-            if (url == null ||url.equals("")) {
+            if (url == null || url.equals("")) {
                 throw new NoSuchElementException();
             }
             this.url = url;
             return this;
         }
 
-        public Builder additionalChapter( int additionalChapter) {
+        public Builder additionalChapter(int additionalChapter) {
             this.additionalChapter = additionalChapter;
             return this;
         }
 
-        public CrawlNovelFromHtml builder(){
+        public CrawlNovelFromHtml builder() {
             return new CrawlNovelFromHtmlImp(this);
         }
     }
@@ -135,7 +135,7 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
         chapterBuffer.append(mChapters.get(number).getChapterName());
         //换行
         chapterBuffer.append(System.getProperty("line.separator"));
-        Document chapterDoc = Jsoup.connect( mChapters.get(number).getUrl())
+        Document chapterDoc = Jsoup.connect(mChapters.get(number).getUrl())
                 .method(Connection.Method.GET)
                 .headers(CrawlUtils.getHeader())
                 .userAgent(USER_AGENT[(int) Math.random() * 10 % 2])
@@ -170,9 +170,8 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
     }
 
 
-
-    private String getChapterUrl(String chapterUrl){
-        return (chapterUrl.startsWith("http")||chapterUrl.startsWith("https"))?chapterUrl:(getRootUrl(url) + (chapterUrl.contains(getPath(url)) ? chapterUrl : getPath(url) + chapterUrl));
+    private String getChapterUrl(String chapterUrl) {
+        return (chapterUrl.startsWith("http") || chapterUrl.startsWith("https")) ? chapterUrl : (getRootUrl(url) + (chapterUrl.contains(getPath(url)) ? chapterUrl : getPath(url) + chapterUrl));
     }
 
 
@@ -218,8 +217,13 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
 
             chapterTaskCount++;
             //小说下载进度
-            float progress= (float)(Math.round((chapterTaskCount / (float) (mCountChapter) * 100)*10*2))/(10*2);
-            System.out.print("已下载"+progress+"%\r" );
+            float progress = chapterTaskCount / (float) (mCountChapter) * 100;
+            if (progress < 100) {
+                System.out.printf("已下载: %5.2f%%\r", progress);
+            }else if(progress==100){
+                System.out.printf("已下载: %5.2f%%\n", progress);
+            }
+
             if (chapterTaskCount >= mCountChapter) {
                 System.out.println("小说下载成功！！");
                 try {

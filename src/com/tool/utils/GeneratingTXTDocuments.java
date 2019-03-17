@@ -14,6 +14,9 @@ public class GeneratingTXTDocuments {
         if (filePath != null && !filePath.equals("")) {
             {
                 File file = new File(fullPath);
+                if(file.exists()){
+                    file.delete();//如果文件存在则删除原文件
+                }
                 while (!file.exists()) {
                     file.createNewFile();
                 }
@@ -26,6 +29,7 @@ public class GeneratingTXTDocuments {
 
     public void writeDate(String content) {
         try {
+            raf.seek(raf.length());
             raf.write(content.getBytes());
         } catch (IOException e) {
             e.printStackTrace();
