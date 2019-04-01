@@ -56,7 +56,12 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
 
         try {
             cookies = CrawlUtils.getCookies(url);
-            main = Jsoup.connect(this.url).userAgent(USER_AGENT[(int) Math.random() * 10 % 2]).cookies(cookies).timeout(TIME_OUT).get();
+            main = Jsoup.connect(this.url)
+                    .userAgent(USER_AGENT[(int) Math.random() * 10 % 2])
+                    .cookies(cookies)
+                    .timeout(TIME_OUT)
+                    .validateTLSCertificates(false)//javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
+                    .get();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -146,6 +151,7 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
                 .userAgent(USER_AGENT[(int) Math.random() * 10 % 2])
                 .cookies(cookies)
                 .timeout(TIME_OUT)
+                .validateTLSCertificates(false)//javax.net.ssl.SSLHandshakeException: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
                 .get();
         Elements e = chapterDoc.select("div#content");
         //获取章节正文，并格式化。
