@@ -103,7 +103,13 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
      */
     private void parseHtml() {
 
-        Elements chapters = main.select(Site.CHAPTER_LIST_CSSQUERY);
+        Elements chapters = null;
+        for (String cssQuery : Site.CHAPTER_LIST_CSSQUERY) {
+            chapters = main.select(cssQuery);
+            if (chapters != null && chapters.size() > 0) {
+                break;
+            }
+        }
         if (additionalChapter > chapters.size()) {
             return;
         }
@@ -169,7 +175,14 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
     @Override
     public String getNovelName() {
         String novelName = null;
-        Elements elements = main.select(Site.NAME_CSSQUERY);
+
+        Elements elements = null;
+        for (String cssQuery : Site.NAME_CSSQUERY) {
+            elements = main.select(cssQuery);
+            if (elements != null && elements.size() > 0) {
+                break;
+            }
+        }
         if (elements != null && elements.size() > 0) {
             novelName = elements.first().text();
         }

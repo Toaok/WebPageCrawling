@@ -1,7 +1,5 @@
 package com.tool.crawl;
 
-import java.io.IOException;
-
 /**
  * @author TOAOK
  * @version 1.0  2018/1/3.

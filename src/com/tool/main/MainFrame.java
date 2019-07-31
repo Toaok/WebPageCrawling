@@ -100,6 +100,9 @@ public class MainFrame extends JFrame {
                             crawlNovelFromHtml.download();
                             break;
                         default:
+                            if (selectSite.equals("")) {
+                                selectSite = "0";
+                            }
                             crawlNovelFromHtml = new CrawlNovelFromHtmlImp.Builder()
                                     .url(url)
                                     .additionalChapter(Integer.parseInt(selectSite))

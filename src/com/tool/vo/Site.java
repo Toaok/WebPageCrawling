@@ -10,6 +10,13 @@ public class Site {
 
     public final static String OTHER_SITE = "其他(0)";
 
-    public final static String NAME_CSSQUERY = "div.book>div.info>h2";
-    public final static String CHAPTER_LIST_CSSQUERY = "div.listmain>dl>dd>a";
+    public final static String[] NAME_CSSQUERY = {
+            "div.book>div.info>h2",
+            "div#maininfo>div#info>h1"
+    };
+
+    public final static String[] CHAPTER_LIST_CSSQUERY = {
+            "div.listmain>dl>dd>a",
+            "div#wrapper>div.box_con>div#list>dl>dd>a"
+    };
 }
