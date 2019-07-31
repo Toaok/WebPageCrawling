@@ -1,10 +1,10 @@
 package com.tool.crawl;
 
-import com.tool.main.NovelDownload;
 import com.tool.utils.CrawlUtils;
 import com.tool.utils.GeneratingTXTDocuments;
 import com.tool.utils.ThreadPoolManager;
 import com.tool.vo.Chapter;
+import com.tool.vo.Site;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -103,9 +103,10 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
      */
     private void parseHtml() {
 
-        Elements catalog = main.select("div#wrapper>div.box_con>div#list>dl");
-        Elements chapters = catalog.select("a");
-
+        Elements chapters = main.select(Site.CHAPTER_LIST_CSSQUERY);
+        if (additionalChapter > chapters.size()) {
+            return;
+        }
         //实际章节数
         mCountChapter = chapters.size() - additionalChapter;
 
@@ -167,7 +168,11 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
 
     @Override
     public String getNovelName() {
-        String novelName = main.select("div#maininfo>div#info>h1").first().text();
+        String novelName = null;
+        Elements elements = main.select(Site.NAME_CSSQUERY);
+        if (elements != null && elements.size() > 0) {
+            novelName = elements.first().text();
+        }
         return novelName;
     }
 
@@ -177,7 +182,7 @@ public class CrawlNovelFromHtmlImp implements CrawlNovelFromHtml {
             filePath = CrawlUtils.getDefaultPath();
         }
 
-        System.out.println("文件路径："+filePath);
+        System.out.println("文件路径：" + filePath);
 
         String result = "";
         try {

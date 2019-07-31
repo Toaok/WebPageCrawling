@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 /**
  * @author TOAOK
@@ -45,7 +47,10 @@ public class MainFrame extends JFrame {
         mSite = new JComboBox();
         mSite.addItem(Site.BIQUGE_SITE);
         mSite.addItem(Site.DINGDIAN_SITE);
-
+        mSite.addItem(Site.OTHER_SITE);
+        ComboBoxEditor editor = mSite.getEditor();
+        JTextField textField = (JTextField) editor.getEditorComponent();
+        textField.setDocument(new IntegerDocument());
 
         mUrl = new JTextField();
 
@@ -59,6 +64,18 @@ public class MainFrame extends JFrame {
         this.add(new Panel(), BorderLayout.SOUTH);
 
 
+        mSite.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getItem().toString().equals(Site.OTHER_SITE)) {
+                    mSite.setEditable(true);
+                } else {
+                    mSite.setEditable(false);
+                }
+            }
+        });
+
+
         mDownloadButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -68,16 +85,26 @@ public class MainFrame extends JFrame {
                     String selectSite = mSite.getSelectedItem().toString();
                     switch (selectSite) {
                         case Site.DINGDIAN_SITE:
-                            crawlNovelFromHtml =new CrawlNovelFromHtmlImp.Builder()
+                            crawlNovelFromHtml = new CrawlNovelFromHtmlImp.Builder()
                                     .url(url)
                                     .additionalChapter(8)
                                     .builder();
+                            System.out.println("additionalChapter:" + 8);
                             crawlNovelFromHtml.download();
                             break;
                         case Site.BIQUGE_SITE:
-                            crawlNovelFromHtml =new CrawlNovelFromHtmlImp.Builder()
+                            crawlNovelFromHtml = new CrawlNovelFromHtmlImp.Builder()
                                     .url(url)
                                     .builder();
+                            System.out.println("additionalChapter:" + 0);
+                            crawlNovelFromHtml.download();
+                            break;
+                        default:
+                            crawlNovelFromHtml = new CrawlNovelFromHtmlImp.Builder()
+                                    .url(url)
+                                    .additionalChapter(Integer.parseInt(selectSite))
+                                    .builder();
+                            System.out.println("additionalChapter:" + selectSite);
                             crawlNovelFromHtml.download();
                             break;
                     }

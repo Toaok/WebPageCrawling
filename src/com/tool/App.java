@@ -14,4 +14,6 @@ public class App {
         CrawlUtils.init(app);
         NovelDownload.init();
     }
+
+
 }

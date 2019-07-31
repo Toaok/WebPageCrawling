@@ -5,6 +5,11 @@ package com.tool.vo;
  * @version 1.0  2018/1/10.
  */
 public class Site {
-    public final static String DINGDIAN_SITE = "顶点";
-    public final static String BIQUGE_SITE = "笔趣阁";
+    public final static String DINGDIAN_SITE = "顶点(8)";
+    public final static String BIQUGE_SITE = "笔趣阁(0)";
+
+    public final static String OTHER_SITE = "其他(0)";
+
+    public final static String NAME_CSSQUERY = "div.book>div.info>h2";
+    public final static String CHAPTER_LIST_CSSQUERY = "div.listmain>dl>dd>a";
 }
