@@ -10,11 +10,16 @@ public class GeneratingTXTDocuments {
     private RandomAccessFile raf;
 
     public GeneratingTXTDocuments(String filePath, String fileName) throws IOException {
-        String fullPath = filePath + File.separator + fileName;
+        String fullPath;
+        if (fileName.endsWith(".txt")) {
+            fullPath = filePath + File.separator + fileName;
+        } else {
+            fullPath = filePath + File.separator + fileName + ".txt";
+        }
         if (filePath != null && !filePath.equals("")) {
             {
                 File file = new File(fullPath);
-                if(file.exists()){
+                if (file.exists()) {
                     file.delete();//如果文件存在则删除原文件
                 }
                 while (!file.exists()) {
@@ -22,7 +27,7 @@ public class GeneratingTXTDocuments {
                 }
                 this.raf = new RandomAccessFile(file, "rw");
             }
-        }else {
+        } else {
             System.out.println("文件路径出问题了。。。");
         }
     }
